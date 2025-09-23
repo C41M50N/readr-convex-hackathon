@@ -14,6 +14,9 @@ importers:
       '@ai-sdk/openai':
         specifier: ^2.0.32
         version: 2.0.32(zod@3.25.76)
+      '@convex-dev/action-retrier':
+        specifier: ^0.2.1
+        version: 0.2.1(convex@1.27.1(react@19.1.1))
       '@convex-dev/react-query':
         specifier: 0.0.0-alpha.8
         version: 0.0.0-alpha.8(@tanstack/react-query@5.90.1(react@19.1.1))(convex@1.27.1(react@19.1.1))
@@ -321,6 +324,11 @@ packages:
   '@cloudflare/kv-asset-handler@0.4.0':
     resolution: {integrity: sha512-+tv3z+SPp+gqTIcImN9o0hqE9xyfQjI1XD9pL6NuKjua9B1y7mNYv0S9cP+QEbA4ppVgGZEmKOvHX5G5Ei1CVA==}
     engines: {node: '>=18.0.0'}
+
+  '@convex-dev/action-retrier@0.2.1':
+    resolution: {integrity: sha512-yxc2ECtgFAAync8Yf1ykh1nzgXkXjrCA5mFYB0lRq/Dgx1TFyFuYfw10ECn7v9/aMUjzUpyJEJp9vRscrfFsng==}
+    peerDependencies:
+      convex: ~1.16.5 || >=1.17.0 <1.35.0
 
   '@convex-dev/react-query@0.0.0-alpha.8':
     resolution: {integrity: sha512-Rv/q7/CplU75f7ckBd2vh+HoeeQ0tOrjwMl14Hk7D/03e55oUIU0TV5JYYzC79ZQyyAtoj7CmCo5ZxcmtKNv1Q==}
@@ -3684,6 +3692,10 @@ snapshots:
   '@cloudflare/kv-asset-handler@0.4.0':
     dependencies:
       mime: 3.0.0
+
+  '@convex-dev/action-retrier@0.2.1(convex@1.27.1(react@19.1.1))':
+    dependencies:
+      convex: 1.27.1(react@19.1.1)
 
   '@convex-dev/react-query@0.0.0-alpha.8(@tanstack/react-query@5.90.1(react@19.1.1))(convex@1.27.1(react@19.1.1))':
     dependencies:

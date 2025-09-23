@@ -8,14 +8,16 @@
  * @module
  */
 
+import type * as content from "../content.js";
+import type * as index from "../index.js";
+import type * as lib_firecrawl from "../lib/firecrawl.js";
+import type * as lib_llm from "../lib/llm.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as content from "../content.js";
-import type * as lib_firecrawl from "../lib/firecrawl.js";
-import type * as lib_llm from "../lib/llm.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,14 +29,67 @@ import type * as lib_llm from "../lib/llm.js";
  */
 declare const fullApi: ApiFromModules<{
   content: typeof content;
+  index: typeof index;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/llm": typeof lib_llm;
 }>;
+declare const fullApiWithMounts: typeof fullApi;
+
 export declare const api: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "public">
 >;
 export declare const internal: FilterApi<
-  typeof fullApi,
+  typeof fullApiWithMounts,
   FunctionReference<any, "internal">
 >;
+
+export declare const components: {
+  actionRetrier: {
+    public: {
+      cancel: FunctionReference<
+        "mutation",
+        "internal",
+        { runId: string },
+        boolean
+      >;
+      cleanup: FunctionReference<
+        "mutation",
+        "internal",
+        { runId: string },
+        any
+      >;
+      start: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          functionArgs: any;
+          functionHandle: string;
+          options: {
+            base: number;
+            initialBackoffMs: number;
+            logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+            maxFailures: number;
+            onComplete?: string;
+            runAfter?: number;
+            runAt?: number;
+          };
+        },
+        string
+      >;
+      status: FunctionReference<
+        "query",
+        "internal",
+        { runId: string },
+        | { type: "inProgress" }
+        | {
+            result:
+              | { returnValue: any; type: "success" }
+              | { error: string; type: "failed" }
+              | { type: "canceled" };
+            type: "completed";
+          }
+      >;
+    };
+  };
+};

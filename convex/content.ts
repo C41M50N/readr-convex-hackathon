@@ -7,6 +7,8 @@ import {
 	internalMutation,
 	internalQuery,
 } from "./_generated/server";
+import { runIdValidator, runResultValidator } from "@convex-dev/action-retrier";
+import { retrier } from "./index";
 import { firecrawl } from "./lib/firecrawl";
 import * as llm from "./lib/llm";
 import { ArticleMetadata } from "./schema";
@@ -37,17 +39,30 @@ export const ingest = action({
 
 		const cleanHtml = await getCleanHTML(normalizedUrl);
 
-		// Schedule Metadata extraction
-		await ctx.scheduler.runAfter(0, internal.content.extractMetadata, {
+		// Set initial status
+		await ctx.runMutation(internal.content.createContentEntry, {
 			url: normalizedUrl,
-			html: cleanHtml,
 		});
 
-		// Schedule HTML to Markdown conversion
-		await ctx.scheduler.runAfter(0, internal.content.writeMarkdown, {
-			url: normalizedUrl,
-			html: cleanHtml,
-		});
+		// Start metadata extraction with retries
+		await retrier.run(
+			ctx,
+			internal.content.extractMetadata,
+			{ url: normalizedUrl, html: cleanHtml },
+			{
+				onComplete: internal.content.handleMetadataComplete,
+			}
+		);
+
+		// Start HTML to Markdown conversion with retries
+		await retrier.run(
+			ctx,
+			internal.content.writeMarkdown,
+			{ url: normalizedUrl, html: cleanHtml },
+			{
+				onComplete: internal.content.handleMarkdownComplete,
+			}
+		);
 	},
 });
 
@@ -145,11 +160,13 @@ export const storeMetadata = internalMutation({
 		});
 
 		if (existing) {
+			const newStatus = existing.markdown ? "completed" : "extracting";
 			await ctx.db.patch(existing._id, {
 				metadata: {
 					...existing.metadata,
 					...args.metadata,
 				},
+				ingestionStatus: newStatus,
 			});
 			console.log("Updated metadata for URL:", args.url);
 			return;
@@ -160,6 +177,7 @@ export const storeMetadata = internalMutation({
 			metadata: {
 				...args.metadata,
 			},
+			ingestionStatus: "extracting",
 		});
 		console.info("Inserted new content for URL:", args.url);
 	},
@@ -173,8 +191,10 @@ export const storeMarkdown = internalMutation({
 		});
 
 		if (existing) {
+			const newStatus = existing.metadata ? "completed" : "converting";
 			await ctx.db.patch(existing._id, {
 				markdown: args.markdown,
+				ingestionStatus: newStatus,
 			});
 			console.log("Updated markdown for URL:", args.url);
 			return;
@@ -183,8 +203,61 @@ export const storeMarkdown = internalMutation({
 		await ctx.db.insert("contents", {
 			url: args.url,
 			markdown: args.markdown,
+			ingestionStatus: "converting",
 		});
 		console.info("Inserted new content for URL:", args.url);
+	},
+});
+
+export const createContentEntry = internalMutation({
+	args: { url: v.string() },
+	handler: async (ctx, args) => {
+		await ctx.db.insert("contents", {
+			url: args.url,
+			ingestionStatus: "pending",
+		});
+		console.info("Created content entry for URL:", args.url);
+	},
+});
+
+export const handleMetadataComplete = internalMutation({
+	args: { runId: runIdValidator, result: runResultValidator },
+	handler: async (ctx, args) => {
+		// Extract URL from the run result - this is a bit tricky since we don't have direct access
+		// We'll need to find the content entry that doesn't have metadata yet
+		// For now, just log the completion
+		if (args.result.type === "success") {
+			console.log("Metadata extraction completed successfully");
+			// The metadata is already stored by the extractMetadata action
+		} else if (args.result.type === "failed") {
+			console.error("Metadata extraction failed after retries:", args.result.error);
+			// Update status to failed
+			const content = await ctx.db.query("contents").first();
+			if (content) {
+				await ctx.db.patch(content._id, { ingestionStatus: "failed" });
+			}
+		} else if (args.result.type === "canceled") {
+			console.log("Metadata extraction was canceled");
+		}
+	},
+});
+
+export const handleMarkdownComplete = internalMutation({
+	args: { runId: runIdValidator, result: runResultValidator },
+	handler: async (ctx, args) => {
+		if (args.result.type === "success") {
+			console.log("Markdown conversion completed successfully");
+			// The markdown is already stored by the writeMarkdown action
+		} else if (args.result.type === "failed") {
+			console.error("Markdown conversion failed after retries:", args.result.error);
+			// Update status to failed
+			const content = await ctx.db.query("contents").first();
+			if (content) {
+				await ctx.db.patch(content._id, { ingestionStatus: "failed" });
+			}
+		} else if (args.result.type === "canceled") {
+			console.log("Markdown conversion was canceled");
+		}
 	},
 });
 

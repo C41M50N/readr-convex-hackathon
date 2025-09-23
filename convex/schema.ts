@@ -17,6 +17,13 @@ export default defineSchema({
     url: v.string(),
     markdown: v.optional(v.string()),
     metadata: v.optional(ArticleMetadata),
+    ingestionStatus: v.optional(v.union(
+      v.literal("pending"),
+      v.literal("extracting"),
+      v.literal("converting"),
+      v.literal("completed"),
+      v.literal("failed")
+    )),
   }).index('by_url', ['url']),
 
   // Generated content, specific to a user and a piece of content
