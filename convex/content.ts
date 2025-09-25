@@ -93,16 +93,6 @@ export const extractMetadata = internalAction({
 		const favicon = doc.metadata?.favicon as string | undefined;
 		const summary = doc.summary;
 
-		console.log("Extracted metadata:", {
-			title,
-			description,
-			author,
-			publish_date,
-			cover_img,
-			favicon,
-			summary,
-		});
-
 		await ctx.runMutation(internal.content.storeMetadata, {
 			url: args.url,
 			metadata: {
