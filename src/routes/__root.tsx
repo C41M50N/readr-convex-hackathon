@@ -1,10 +1,28 @@
-import { TanstackDevtools } from '@tanstack/react-devtools'
-import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { TanstackDevtools } from '@tanstack/react-devtools'
+
+import Header from '../components/Header'
+
+import ClerkProvider from '../integrations/clerk/provider'
+
 import ConvexProvider from '../integrations/convex/provider'
+
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+
 import appCss from '../styles.css?url'
 
-export const Route = createRootRoute({
+import type { QueryClient } from '@tanstack/react-query'
+
+interface MyRouterContext {
+  queryClient: QueryClient
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
@@ -36,20 +54,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <ConvexProvider>
-          {children}
-          <TanstackDevtools
-            config={{
-              position: 'bottom-left',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
-        </ConvexProvider>
+        <ClerkProvider>
+          <ConvexProvider>
+            <Header />
+            {children}
+            <TanstackDevtools
+              config={{
+                position: 'bottom-left',
+              }}
+              plugins={[
+                {
+                  name: 'Tanstack Router',
+                  render: <TanStackRouterDevtoolsPanel />,
+                },
+                TanStackQueryDevtools,
+              ]}
+            />
+          </ConvexProvider>
+        </ClerkProvider>
         <Scripts />
       </body>
     </html>

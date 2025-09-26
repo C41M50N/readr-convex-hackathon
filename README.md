@@ -31,6 +31,11 @@ This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 
 
 
+## Setting up Clerk
+
+- Set the `VITE_CLERK_PUBLISHABLE_KEY` in your `.env.local`.
+
+
 ## Setting up Convex
 
 - Set the `VITE_CONVEX_URL` and `CONVEX_DEPLOYMENT` environment variables in your `.env.local`. (Or run `npx convex init` to set them automatically.)

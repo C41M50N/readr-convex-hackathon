@@ -1,39 +1,40 @@
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useConvexAction } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import logo from '../logo.svg'
+import React from 'react'
+import { api } from '../../convex/_generated/api'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
+  const [url, setUrl] = React.useState('')
+  const { mutateAsync: ingest, isPending: isIngesting } = useMutation({
+    mutationFn: useConvexAction(api.content.ingest),
+    onSuccess: () => {
+      console.log('Ingestion started successfully!')
+    }
+  })
+
+  async function handleIngest() {
+    await ingest({ url })
+  }
+
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
+    <div className="p-4 flex flex-row gap-4">
+      <Input
+        type="text"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="Enter URL"
+        className="w-lg"
+      />
+      <Button onClick={handleIngest} disabled={isIngesting}>
+        {isIngesting ? 'Ingesting...' : 'Ingest'}
+      </Button>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 {
-  "projectName": "readr-convex-hackathon",
+  "projectName": "tsxc-test-2",
   "mode": "file-router",
   "typescript": true,
   "tailwind": true,
@@ -9,8 +9,10 @@
   "framework": "react-cra",
   "chosenAddOns": [
     "start",
+    "clerk",
     "convex",
     "shadcn",
-    "t3env"
+    "t3env",
+    "tanstack-query"
   ]
 }

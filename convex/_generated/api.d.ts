@@ -12,6 +12,7 @@ import type * as content from "../content.js";
 import type * as index from "../index.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
 import type * as lib_llm from "../lib/llm.js";
+import type * as metadata from "../metadata.js";
 
 import type {
   ApiFromModules,
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   index: typeof index;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/llm": typeof lib_llm;
+  metadata: typeof metadata;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

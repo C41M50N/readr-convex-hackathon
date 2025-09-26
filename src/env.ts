@@ -3,11 +3,7 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    CONVEX_DEPLOYMENT: z.string().min(1),
-    FIRECRAWL_API_KEY: z.string().min(1),
-    GEMINI_API_KEY: z.string().min(1),
-    OPENAI_API_KEY: z.string().min(1),
-    ORION_BASE_URL: z.string().url(),
+    SERVER_URL: z.string().url().optional(),
   },
 
   /**
@@ -17,7 +13,7 @@ export const env = createEnv({
   clientPrefix: 'VITE_',
 
   client: {
-    VITE_CONVEX_URL: z.string().url(),
+    VITE_APP_TITLE: z.string().min(1).optional(),
   },
 
   /**
