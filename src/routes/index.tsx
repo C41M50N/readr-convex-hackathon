@@ -13,7 +13,7 @@ export const Route = createFileRoute('/')({
 function App() {
   const [url, setUrl] = React.useState('')
   const { mutateAsync: ingest, isPending: isIngesting } = useMutation({
-    mutationFn: useConvexAction(api.content.ingest),
+    mutationFn: useConvexAction(api.ingestion.index.ingest),
     onSuccess: () => {
       console.log('Ingestion started successfully!')
     }
