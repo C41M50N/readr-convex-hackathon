@@ -36,7 +36,9 @@ export default defineSchema({
   user_contents: defineTable({
     userId: v.id('users'),
     contentId: v.id('contents'),
-    generated_contents: v.array(v.id('generated_contents')),
+    tags: v.array(v.string()),
+    notes: v.string(),
+    // generated_contents: v.array(v.id('generated_contents')),
   }),
 
   // Chat history for a user and a piece of content

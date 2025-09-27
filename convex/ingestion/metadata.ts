@@ -2,10 +2,10 @@
 
 import { v } from "convex/values";
 import { z } from "zod";
-import { internal } from "./_generated/api";
-import { internalAction } from "./_generated/server";
-import { firecrawl } from "./lib/firecrawl";
-import * as llm from "./lib/llm";
+import { internal } from "../_generated/api";
+import { internalAction } from "../_generated/server";
+import { firecrawl } from "../lib/firecrawl";
+import * as llm from "../lib/llm";
 
 export const extractMetadata = internalAction({
   args: {
@@ -34,7 +34,7 @@ export const extractMetadata = internalAction({
     const favicon = doc.metadata?.favicon as string | undefined;
     const summary = doc.summary;
 
-    await ctx.runMutation(internal.content.storeMetadata, {
+    await ctx.runMutation(internal.ingestion.index.storeMetadata, {
       url: args.url,
       metadata: {
         title,
