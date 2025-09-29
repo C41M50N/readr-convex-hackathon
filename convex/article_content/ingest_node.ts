@@ -7,7 +7,7 @@ import { internalAction } from "../_generated/server";
 import { firecrawl } from "../lib/firecrawl";
 import * as llm from "../lib/llm";
 
-export const extractMetadata = internalAction({
+export const ingestArticleMetadata = internalAction({
   args: {
     url: v.string(),
     html: v.string(),
@@ -34,7 +34,7 @@ export const extractMetadata = internalAction({
     const favicon = doc.metadata?.favicon as string | undefined;
     const summary = doc.summary;
 
-    await ctx.runMutation(internal.ingestion.index.storeMetadata, {
+    await ctx.runMutation(internal.article_content.ingest.storeArticleMetadata, {
       url: args.url,
       metadata: {
         title,

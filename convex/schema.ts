@@ -11,20 +11,49 @@ export const ArticleMetadata = v.object({
   cover_img: v.optional(v.string()),
 })
 
+export const ArticleContent = v.object({
+  _id: v.id('contents'),
+  type: v.literal('article'),
+  url: v.string(),
+  markdown: v.optional(v.string()),
+  metadata: v.optional(ArticleMetadata),
+  ingestionStatus: v.optional(v.union(
+    v.literal("pending"),
+    v.literal("extracting"),
+    v.literal("converting"),
+    v.literal("completed"),
+    v.literal("failed")
+  )),
+})
+
+export const VideoMetadata = v.object({
+  title: v.string(),
+  channel: v.string(),
+  thumbnail: v.optional(v.string()),
+  duration: v.optional(v.number()),
+})
+
+export const VideoContent = v.object({
+  _id: v.id('contents'),
+  type: v.literal('video'),
+  url: v.string(),
+  transcript: v.string(),
+  metadata: VideoMetadata,
+  ingestionStatus: v.optional(v.union(
+    v.literal("pending"),
+    v.literal("extracting"),
+    v.literal("converting"),
+    v.literal("completed"),
+    v.literal("failed")
+  )),
+})
+
 export default defineSchema({
   // Parsed content, shared between all users
-  contents: defineTable({
-    url: v.string(),
-    markdown: v.optional(v.string()),
-    metadata: v.optional(ArticleMetadata),
-    ingestionStatus: v.optional(v.union(
-      v.literal("pending"),
-      v.literal("extracting"),
-      v.literal("converting"),
-      v.literal("completed"),
-      v.literal("failed")
-    )),
-  }).index('by_url', ['url']),
+  contents: defineTable(v.union(
+    ArticleContent,
+    VideoContent
+  )).index('by_url', ['url']),
 
   // Generated content, specific to a user and a piece of content
   generated_contents: defineTable({

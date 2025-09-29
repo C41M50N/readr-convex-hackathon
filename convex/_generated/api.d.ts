@@ -8,9 +8,10 @@
  * @module
  */
 
+import type * as article_content_ingest from "../article_content/ingest.js";
+import type * as article_content_ingest_node from "../article_content/ingest_node.js";
 import type * as index from "../index.js";
-import type * as ingestion_index from "../ingestion/index.js";
-import type * as ingestion_node from "../ingestion/node.js";
+import type * as ingestion from "../ingestion.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
 import type * as lib_llm from "../lib/llm.js";
 
@@ -29,9 +30,10 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "article_content/ingest": typeof article_content_ingest;
+  "article_content/ingest_node": typeof article_content_ingest_node;
   index: typeof index;
-  "ingestion/index": typeof ingestion_index;
-  "ingestion/node": typeof ingestion_node;
+  ingestion: typeof ingestion;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/llm": typeof lib_llm;
 }>;
