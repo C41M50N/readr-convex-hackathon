@@ -1,40 +1,42 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useConvexAction } from '@convex-dev/react-query'
-import { useMutation } from '@tanstack/react-query'
+import { ContentCard } from '@/components/content-card'
+import { SignInButton, useUser } from '@clerk/clerk-react'
+import { convexQuery } from '@convex-dev/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import React from 'react'
-import { api } from '../../convex/_generated/api'
+import { api } from 'convex/_generated/api'
 
 export const Route = createFileRoute('/')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData({
+      ...convexQuery(api.content.getInboxContent, {}),
+      gcTime: 10000,
+    })
+    return null
+  },
   component: App,
 })
 
 function App() {
-  const [url, setUrl] = React.useState('')
-  const { mutateAsync: ingest, isPending: isIngesting } = useMutation({
-    mutationFn: useConvexAction(api.ingestion.ingest),
-    onSuccess: () => {
-      console.log('Ingestion started successfully!')
-    }
-  })
+  const { isSignedIn } = useUser()
+  const { data: contents } = useSuspenseQuery(convexQuery(api.content.getInboxContent, {}))
 
-  async function handleIngest() {
-    await ingest({ url })
+  if (!isSignedIn) {
+    return (
+      <SignInButton />
+    )
   }
 
   return (
     <div className="p-4 flex flex-row gap-4">
-      <Input
-        type="text"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder="Enter URL"
-        className="w-lg"
-      />
-      <Button onClick={handleIngest} disabled={isIngesting}>
-        {isIngesting ? 'Ingesting...' : 'Ingest'}
-      </Button>
+      {contents.length === 0 ? (
+        <div className="text-center text-gray-500">No content found. Add some content to get started!</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          {contents.map(content => (
+            <ContentCard key={content._id} content={content} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

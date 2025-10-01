@@ -17,6 +17,9 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { XSidebar } from '@/components/x-sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -56,20 +59,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <ClerkProvider>
           <ConvexProvider>
-            <Header />
-            {children}
-            <TanstackDevtools
-              config={{
-                position: 'bottom-left',
-              }}
-              plugins={[
-                {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-                TanStackQueryDevtools,
-              ]}
-            />
+            <SidebarProvider>
+              <XSidebar />
+              {/* <Header /> */}
+              {children}
+              <TanstackDevtools
+                config={{
+                  position: 'bottom-left',
+                }}
+                plugins={[
+                  {
+                    name: 'Tanstack Router',
+                    render: <TanStackRouterDevtoolsPanel />,
+                  },
+                  TanStackQueryDevtools,
+                ]}
+              />
+              <Toaster />
+            </SidebarProvider>
           </ConvexProvider>
         </ClerkProvider>
         <Scripts />

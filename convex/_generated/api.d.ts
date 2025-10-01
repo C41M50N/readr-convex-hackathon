@@ -10,6 +10,7 @@
 
 import type * as article_content_ingest from "../article_content/ingest.js";
 import type * as article_content_ingest_node from "../article_content/ingest_node.js";
+import type * as content from "../content.js";
 import type * as index from "../index.js";
 import type * as ingestion from "../ingestion.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
@@ -34,6 +35,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "article_content/ingest": typeof article_content_ingest;
   "article_content/ingest_node": typeof article_content_ingest_node;
+  content: typeof content;
   index: typeof index;
   ingestion: typeof ingestion;
   "lib/firecrawl": typeof lib_firecrawl;
