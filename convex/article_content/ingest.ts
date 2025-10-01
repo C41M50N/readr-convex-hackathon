@@ -11,6 +11,8 @@ export const ingestArticle = internalAction({
     console.info("Ingesting article from URL:", args.url);
     const cleanHtml = await getCleanHtml(args.url);
 
+    // TODO: add check for existing content here
+
     await ctx.runMutation(internal.article_content.ingest.createArticleContentEntry, {
       url: args.url,
     });
@@ -142,5 +144,8 @@ async function getCleanHtml(url: string): Promise<string> {
   const response = await fetch(
     `${process.env.ORION_BASE_URL}/clean-html?url=${encodeURIComponent(url)}`,
   );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch clean HTML: ${response.statusText}`);
+  }
   return response.text();
 }

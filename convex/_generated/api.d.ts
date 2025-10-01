@@ -14,6 +14,8 @@ import type * as index from "../index.js";
 import type * as ingestion from "../ingestion.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
 import type * as lib_llm from "../lib/llm.js";
+import type * as video_content_ingest from "../video_content/ingest.js";
+import type * as video_content_ingest_node from "../video_content/ingest_node.js";
 
 import type {
   ApiFromModules,
@@ -36,6 +38,8 @@ declare const fullApi: ApiFromModules<{
   ingestion: typeof ingestion;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/llm": typeof lib_llm;
+  "video_content/ingest": typeof video_content_ingest;
+  "video_content/ingest_node": typeof video_content_ingest_node;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

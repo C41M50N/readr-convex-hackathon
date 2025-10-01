@@ -28,8 +28,11 @@ export const ArticleContent = v.object({
 
 export const VideoMetadata = v.object({
   title: v.string(),
-  channel: v.string(),
-  thumbnail: v.optional(v.string()),
+  channel_name: v.string(),
+  channel_url: v.string(),
+  thumbnail: v.string(),
+  favicon: v.string(),
+  publish_date: v.string(),
   duration: v.optional(v.number()),
 })
 
@@ -37,8 +40,9 @@ export const VideoContent = v.object({
   _id: v.id('contents'),
   type: v.literal('video'),
   url: v.string(),
-  transcript: v.string(),
-  metadata: VideoMetadata,
+  transcript: v.optional(v.string()),
+  summary: v.optional(v.string()),
+  metadata: v.optional(VideoMetadata),
   ingestionStatus: v.optional(v.union(
     v.literal("pending"),
     v.literal("extracting"),
